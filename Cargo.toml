@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "agency",
+    "bank",
+    "client",
+]
