@@ -1,0 +1,12 @@
+digraph Automata {
+	_initial_0 [label="", shape="plaintext"];
+	_initial_0 -> CheckBalance;
+	Finish [style="bold"];
+	Error [style="bold"];
+	Rollback [style="bold"];
+	Deposit -> Finish [label=deposit];
+	Deposit -> Rollback [label=deposit];
+	Withdraw -> Deposit [label=withdraw];
+	CheckBalance -> Error [label=check_balance];
+	CheckBalance -> Withdraw [label=check_balance];
+}

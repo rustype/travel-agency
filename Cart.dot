@@ -1,0 +1,8 @@
+digraph Automata {
+	_initial_0 [label="", shape="plaintext"];
+	_initial_0 -> Empty;
+	NonEmpty [style="bold"];
+	Empty [style="bold"];
+	Empty -> NonEmpty [label=add_trip];
+	NonEmpty -> Empty [label=buy];
+}
