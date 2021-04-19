@@ -1,5 +1,5 @@
 mod agency;
-// mod bank;
+mod bank;
 
 use agency::agency_api::*;
 use std::{
@@ -15,8 +15,6 @@ const BUY: &'static str = "buy";
 const RETRY: &'static str = "retry";
 
 fn main() -> Result<()> {
-    // let input = stdin();
-    // let mut output = stdout();
     let mut input_buffer = String::new();
     let mut session = TSession::new();
     loop {
