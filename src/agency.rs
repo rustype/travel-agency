@@ -1,3 +1,5 @@
+use crate::bank::bank_api;
+use crate::bank::bank_api::{CheckBalanceState, DepositState, FinishState, WithdrawState};
 use crate::Trip;
 use agency_api::*;
 use typestate::typestate;
@@ -134,19 +136,37 @@ impl NonEmptyState for Session<NonEmpty> {
     }
     fn buy(self, token: &str) -> Transaction {
         // TODO finish
-        if token == "valid_client" {
-            Transaction::Empty(Session::<Empty> {
-                state: Empty {
-                    last_search: vec![],
-                },
-            })
-        } else {
-            Transaction::TError(Session::<TError> {
-                state: TError {
-                    selected: self.state.selected,
-                },
-            })
+        let mut passed = vec![true; self.state.selected.len()];
+        for (i, trip) in self.state.selected.iter().enumerate() {
+            let check = bank_api::Transaction::<bank_api::CheckBalance>::start_transaction(
+                token,
+                "travel_agency",
+                trip.price,
+            );
+            match check.check_balance() {
+                bank_api::BalanceResult::Withdraw(w) => {
+                    let deposit = w.withdraw();
+                    let fin = deposit.deposit();
+                    fin.finish();
+                    passed[i] = false;
+                }
+                bank_api::BalanceResult::Error(e) => {
+                    use crate::bank::bank_api::ErrorState;
+                    e.finish();
+                    let mut selected = self.state.selected;
+                    let mut j = 0;
+                    selected.retain(|_| (passed[j], j += 1).0);
+                    return Transaction::TError(Session::<TError> {
+                        state: TError { selected },
+                    });
+                }
+            };
         }
+        Transaction::Empty(Session::<Empty> {
+            state: Empty {
+                last_search: vec![],
+            },
+        })
     }
     fn close(self) {
         // consume

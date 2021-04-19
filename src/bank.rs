@@ -1,9 +1,9 @@
-use bank::*;
+use bank_api::*;
 use std::collections::HashMap;
 use typestate::typestate;
 
 #[typestate(enumerate)]
-mod bank {
+pub mod bank_api {
     use std::collections::HashMap;
 
     #[automata]
@@ -64,8 +64,11 @@ mod bank {
 
 impl CheckBalanceState for Transaction<CheckBalance> {
     fn start_transaction(from: &str, to: &str, amount: usize) -> Transaction<CheckBalance> {
+        let mut accounts = HashMap::new();
+        accounts.insert("valid_client".to_string(), 5000);
+        accounts.insert("travel_agency".to_string(), 1000000);
         Transaction::<CheckBalance> {
-            accounts: HashMap::new(),
+            accounts,
             state: CheckBalance {
                 from: from.to_string(),
                 to: to.to_string(),
