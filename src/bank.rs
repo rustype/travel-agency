@@ -1,44 +1,5 @@
 use typestate::typestate;
 
-const AGENCY_PORT: u16 = 9001;
-
-fn main() {
-    println!("Hello, world!");
-}
-
-struct Trip {
-    from: String,
-    to: String,
-    price: u32,
-}
-#[typestate]
-mod agency {
-    use super::*;
-    #[automata]
-    struct Cart;
-
-    #[state]
-    struct Empty;
-
-    trait Empty {
-        fn create() -> Empty;
-        fn search_trip(self, query: &str);
-        fn add_trip(self, trip: Trip) -> NonEmpty;
-        fn close(self);
-    }
-
-    #[state]
-    struct NonEmpty {
-        selected: Vec<Trip>,
-    }
-
-    trait NonEmpty {
-        fn add_trip(&mut self, trip: Trip);
-        fn buy(self, token: &str) -> Empty;
-        fn close(self);
-    }
-}
-
 #[typestate]
 mod bank {
     #[automata]

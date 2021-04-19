@@ -1,8 +1,0 @@
-digraph Automata {
-	_initial_0 [label="", shape="plaintext"];
-	_initial_0 -> EmptyCart;
-	NonEmptyCart [style="bold"];
-	EmptyCart [style="bold"];
-	EmptyCart -> NonEmptyCart [label=add_trip];
-	NonEmptyCart -> EmptyCart [label=buy];
-}
