@@ -43,6 +43,7 @@ fn main() -> Result<()> {
                     }
                     CLOSE => {
                         println!("goodbye!");
+                        // NOTE breaks disable the "one-line handler" approach
                         break;
                     }
                     _ => {
@@ -132,11 +133,9 @@ fn main() -> Result<()> {
                         println!("invalid command: {}", cmd);
                         s.into()
                     }
-                }
+                },
                 TSession::TError(s) => match cmd {
-                    RETRY => {
-                        s.retry().into()
-                    }
+                    RETRY => s.retry().into(),
                     CLOSE => {
                         s.close();
                         println!("closing session!");
