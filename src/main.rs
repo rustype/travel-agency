@@ -2,11 +2,17 @@ mod agency;
 // mod bank;
 
 use agency::agency_api::*;
-use agency::*;
 use std::{
     io::{stdin, stdout, Result, Write},
     usize,
 };
+
+const LOGIN: &'static str = "login";
+const SEARCH: &'static str = "search";
+const SELECT: &'static str = "select";
+const CLOSE: &'static str = "close";
+const BUY: &'static str = "buy";
+const RETRY: &'static str = "retry";
 
 fn main() -> Result<()> {
     // let input = stdin();
@@ -17,106 +23,154 @@ fn main() -> Result<()> {
         prompt(&mut input_buffer, &session)?;
         let split_input: Vec<_> = input_buffer.trim().split(" ").collect();
         println!("{:?}", split_input);
-        session = match (split_input.first(), session) {
-            (Some(&"login"), TSession::Guest(s)) => {
-                if split_input.len() != 3 {
-                    println!("invalid login command. usage: login <username> <password>");
-                    TSession::Guest(s)
-                } else {
-                    match s.login(split_input.get(1).unwrap(), split_input.get(2).unwrap()) {
-                        Login::Empty(empty) => {
-                            println!("login successful");
-                            empty.into()
+        if let Some(&cmd) = split_input.first() {
+            session = match session {
+                TSession::Guest(s) => match cmd {
+                    LOGIN => {
+                        if split_input.len() != 3 {
+                            println!("invalid login command. usage: login <username> <password>");
+                            s.into()
+                        } else {
+                            match s.login(split_input.get(1).unwrap(), split_input.get(2).unwrap())
+                            {
+                                Login::Empty(empty) => {
+                                    println!("login successful");
+                                    empty.into()
+                                }
+                                Login::Error(error) => error.into(),
+                            }
                         }
-                        Login::Error(error) => error.into(),
                     }
-                }
-            }
-            (Some(&"search"), TSession::Empty(mut s)) => {
-                // HACK
-                if split_input.len() != 2 {
-                    println!("invalid search command. usage: search <keyword>")
-                } else {
-                    let trips = s.search_trip(split_input[1]);
-                    for (i, trip) in trips.iter().enumerate() {
-                        println!("{}: {:?}", i, trip);
+                    CLOSE => {
+                        println!("goodbye!");
+                        break;
                     }
-                }
-                TSession::Empty(s)
-            }
-            (Some(&"search"), TSession::NonEmpty(mut s)) => {
-                if split_input.len() != 2 {
-                    println!("invalid search command. usage: search <keyword>")
-                } else {
-                    let trips = s.search_trip(split_input[1]);
-                    for (i, trip) in trips.iter().enumerate() {
-                        println!("{}: {:?}", i, trip);
+                    _ => {
+                        println!("invalid command: {}", cmd);
+                        s.into()
                     }
-                }
-                TSession::NonEmpty(s)
-            }
-            (Some(&"select"), TSession::Empty(s)) => {
-                if split_input.len() != 2 {
-                    println!("invalid search command. usage: search <idx>");
-                    TSession::Empty(s)
-                } else {
-                    let idx = split_input[1].parse::<usize>().unwrap();
-                    match s.add_trip(idx) {
-                        Selection::Empty(s) => {
-                            println!("invalid index: {}", idx);
-                            TSession::Empty(s)
+                },
+                TSession::Empty(mut s) => match cmd {
+                    SEARCH => {
+                        if split_input.len() != 2 {
+                            println!("invalid search command. usage: search <keyword>")
+                        } else {
+                            let trips = s.search_trip(split_input[1]);
+                            for (i, trip) in trips.iter().enumerate() {
+                                println!("{}: {:?}", i, trip);
+                            }
                         }
-                        Selection::NonEmpty(s) => TSession::NonEmpty(s),
+                        s.into()
+                    }
+                    SELECT => {
+                        if split_input.len() != 2 {
+                            println!("invalid search command. usage: search <idx>");
+                            s.into()
+                        } else {
+                            let idx = split_input[1].parse::<usize>().unwrap();
+                            match s.add_trip(idx) {
+                                Selection::Empty(s) => {
+                                    println!("invalid index: {}", idx);
+                                    s.into()
+                                }
+                                Selection::NonEmpty(s) => s.into(),
+                            }
+                        }
+                    }
+                    CLOSE => {
+                        s.close();
+                        println!("closing session!");
+                        break;
+                    }
+                    _ => {
+                        println!("invalid command: {}", cmd);
+                        s.into()
+                    }
+                },
+                TSession::NonEmpty(mut s) => match cmd {
+                    SEARCH => {
+                        if split_input.len() != 2 {
+                            println!("invalid search command. usage: search <keyword>")
+                        } else {
+                            let trips = s.search_trip(split_input[1]);
+                            for (i, trip) in trips.iter().enumerate() {
+                                println!("{}: {:?}", i, trip);
+                            }
+                        }
+                        s.into()
+                    }
+                    SELECT => {
+                        if split_input.len() != 2 {
+                            println!("invalid search command. usage: search <idx>");
+                            s.into()
+                        } else {
+                            let idx = split_input[1].parse::<usize>().unwrap();
+                            match s.add_trip(idx) {
+                                Ok(()) => {}
+                                Err(s) => println!("{}", s),
+                            }
+                            s.into()
+                        }
+                    }
+                    BUY => {
+                        if split_input.len() != 2 {
+                            println!("invalid search command. usage: buy <token>");
+                            s.into()
+                        } else {
+                            match s.buy(split_input[1]) {
+                                Transaction::Empty(empty_sess) => empty_sess.into(),
+                                Transaction::TError(error) => error.into(),
+                            }
+                        }
+                    }
+                    CLOSE => {
+                        s.close();
+                        println!("closing session!");
+                        break;
+                    }
+                    _ => {
+                        println!("invalid command: {}", cmd);
+                        s.into()
                     }
                 }
-            }
-            (Some(&"select"), TSession::NonEmpty(mut s)) => {
-                if split_input.len() != 2 {
-                    println!("invalid search command. usage: search <idx>");
-                    TSession::NonEmpty(s)
-                } else {
-                    let idx = split_input[1].parse::<usize>().unwrap();
-                    match s.add_trip(idx) {
-                        Ok(()) => {}
-                        Err(s) => println!("{}", s),
+                TSession::TError(s) => match cmd {
+                    RETRY => {
+                        s.retry().into()
                     }
-                    TSession::NonEmpty(s)
-                }
-            }
-            (Some(&"buy"), TSession::NonEmpty(s)) => {
-                if split_input.len() != 2 {
-                    println!("invalid search command. usage: buy <token>");
-                    TSession::NonEmpty(s)
-                } else {
-                    match s.buy(split_input[1]) {
-                        Transaction::Empty(empty_sess) => TSession::Empty(empty_sess),
-                        Transaction::TError(error) => TSession::TError(error),
+                    CLOSE => {
+                        s.close();
+                        println!("closing session!");
+                        break;
                     }
-                }
-            }
-            (Some(&"close"), TSession::Guest(_)) => {
-                println!("goodbye!");
-                return Ok(());
-            }
-            (Some(&"close"), TSession::Empty(s)) => {
-                let _ = s.close();
-                println!("closing session!");
-                break;
-            }
-            (Some(&"close"), TSession::NonEmpty(s)) => {
-                let _ = s.close();
-                println!("closing session!");
-                break;
-            }
-            (Some(cmd), session @ _) => {
-                println!("invalid command: {}", cmd);
-                session
-            }
-            (None, session @ _) => {
-                println!("command cannot be empty!");
-                session
-            }
+                    _ => {
+                        println!("invalid command: {}", cmd);
+                        s.into()
+                    }
+                },
+                TSession::Error(s) => match cmd {
+                    CLOSE => {
+                        s.close();
+                        println!("closing session!");
+                        break;
+                    }
+                    _ => {
+                        println!("invalid command: {}", cmd);
+                        s.into()
+                    }
+                },
+            };
         }
+
+        // session = match (split_input.first(), session) {
+        //     (Some(cmd), session @ _) => {
+        //         println!("invalid command: {}", cmd);
+        //         session
+        //     }
+        //     (None, session @ _) => {
+        //         println!("command cannot be empty!");
+        //         session
+        //     }
+        // }
     }
     Ok(())
 }

@@ -54,7 +54,7 @@ pub mod agency_api {
         pub selected: Vec<Trip>,
     }
     pub trait TError {
-        fn try_again(self) -> NonEmpty;
+        fn retry(self) -> NonEmpty;
         fn close(self);
     }
 
@@ -146,6 +146,26 @@ impl NonEmptyState for Session<NonEmpty> {
                     selected: self.state.selected,
                 },
             })
+        }
+    }
+    fn close(self) {
+        // consume
+    }
+}
+
+impl ErrorState for Session<Error> {
+    fn close(self) {
+        // consume
+    }
+}
+
+impl TErrorState for Session<TError> {
+    fn retry(self) -> Session<NonEmpty> {
+        Session::<NonEmpty> {
+            state: NonEmpty {
+                last_search: vec![],
+                selected: self.state.selected,
+            },
         }
     }
     fn close(self) {
