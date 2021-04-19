@@ -160,17 +160,6 @@ fn main() -> Result<()> {
                 },
             };
         }
-
-        // session = match (split_input.first(), session) {
-        //     (Some(cmd), session @ _) => {
-        //         println!("invalid command: {}", cmd);
-        //         session
-        //     }
-        //     (None, session @ _) => {
-        //         println!("command cannot be empty!");
-        //         session
-        //     }
-        // }
     }
     Ok(())
 }
