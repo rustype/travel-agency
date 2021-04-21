@@ -2,28 +2,29 @@ use bank_api::*;
 use std::collections::HashMap;
 use typestate::typestate;
 
-#[typestate(enumerate)]
+#[typestate(enumerate, state_constructors)]
 pub mod bank_api {
     use std::collections::HashMap;
 
     #[automata]
     pub struct Transaction {
-        pub accounts: HashMap<String, usize>,
+        pub accounts: HashMap<String, isize>,
     }
 
     #[state]
-    pub struct CheckBalance {
+    pub struct AccountValidation {
         pub from: String,
         pub to: String,
-        pub amount: usize,
-    }
-    pub trait CheckBalance {
-        fn start_transaction(from: &str, to: &str, amount: usize) -> CheckBalance;
-        fn check_balance(self) -> BalanceResult;
+        pub amount: isize,
     }
 
-    pub enum BalanceResult {
-        Withdraw,
+    pub trait AccountValidation {
+        fn start_transaction(from: &str, to: &str, amount: isize) -> AccountValidation;
+        fn validate_accounts(self) -> AccountValidationResult;
+    }
+
+    pub enum AccountValidationResult {
+        Valid,
         Error,
     }
 
@@ -31,112 +32,87 @@ pub mod bank_api {
     pub struct Error {
         pub message: String,
     }
+
     pub trait Error {
         fn finish(self);
     }
 
     #[state]
-    pub struct Withdraw {
+    pub struct Valid {
         pub from: String,
         pub to: String,
-        pub amount: usize,
-    }
-    pub trait Withdraw {
-        fn withdraw(self) -> Deposit;
+        pub amount: isize,
     }
 
-    #[state]
-    pub struct Deposit {
-        pub from: String,
-        pub to: String,
-        pub amount: usize,
+    pub trait Valid {
+        fn perform_transaction(self) -> TransactionResult;
     }
-    pub trait Deposit {
-        fn deposit(self) -> Finish;
+
+    pub enum TransactionResult {
+        Finish,
+        Error,
     }
 
     #[state]
     pub struct Finish;
+
     pub trait Finish {
         fn finish(self);
     }
 }
 
-impl CheckBalanceState for Transaction<CheckBalance> {
-    fn start_transaction(from: &str, to: &str, amount: usize) -> Transaction<CheckBalance> {
+impl AccountValidationState for Transaction<AccountValidation> {
+    fn start_transaction(from: &str, to: &str, amount: isize) -> Transaction<AccountValidation> {
+        // pretend that the accounts are the connection to a DB
         let mut accounts = HashMap::new();
         accounts.insert("valid_client".to_string(), 5000);
-        accounts.insert("travel_agency".to_string(), 1000000);
-        Transaction::<CheckBalance> {
+        accounts.insert("travel_agency".to_string(), 50000);
+        Self {
             accounts,
-            state: CheckBalance {
-                from: from.to_string(),
-                to: to.to_string(),
-                amount,
-            },
+            state: AccountValidation::new_state(from.to_string(), to.to_string(), amount),
         }
     }
-    fn check_balance(self) -> BalanceResult {
-        if let Some(&amount) = self.accounts.get(&self.state.from) {
-            if let None = self.accounts.get(&self.state.to) {
-                return BalanceResult::Error(Transaction::<Error> {
-                    accounts: self.accounts,
-                    state: Error {
-                        message: String::from("destination account does not exist!"),
-                    },
-                });
-            }
-            if amount > self.state.amount {
-                BalanceResult::Withdraw(Transaction::<Withdraw> {
-                    accounts: self.accounts,
-                    state: Withdraw {
-                        from: self.state.from,
-                        to: self.state.to,
-                        amount: self.state.amount,
-                    },
-                })
-            } else {
-                BalanceResult::Error(Transaction::<Error> {
-                    accounts: self.accounts,
-                    state: Error {
-                        message: String::from("insufficient funds!"),
-                    },
-                })
-            }
-        } else {
-            BalanceResult::Error(Transaction::<Error> {
+    fn validate_accounts(self) -> AccountValidationResult {
+        if !self.accounts.contains_key(&self.state.from) {
+            AccountValidationResult::Error(Transaction::<Error> {
                 accounts: self.accounts,
-                state: Error {
-                    message: String::from("account does not exist"),
-                },
+                state: Error::new_state("Unknown client account".to_string()),
+            })
+        } else if !self.accounts.contains_key(&self.state.to) {
+            AccountValidationResult::Error(Transaction::<Error> {
+                accounts: self.accounts,
+                state: Error::new_state("Unknown destination account".to_string()),
+            })
+        } else {
+            AccountValidationResult::Valid(Transaction::<Valid> {
+                accounts: self.accounts,
+                state: Valid::new_state(self.state.from, self.state.to, self.state.amount),
             })
         }
     }
 }
 
-impl WithdrawState for Transaction<Withdraw> {
-    fn withdraw(mut self) -> Transaction<Deposit> {
-        let balance = self.accounts.get_mut(&self.state.from).unwrap(); // previously checked
-        *balance -= self.state.amount;
-        Transaction::<Deposit> {
-            accounts: self.accounts,
-            state: Deposit {
-                from: self.state.from,
-                to: self.state.to,
-                amount: self.state.amount,
-            },
+impl ValidState for Transaction<Valid> {
+    fn perform_transaction(mut self) -> TransactionResult {
+        let accounts = &mut self.accounts;
+        // safe unwraps
+        let client_balance = accounts.get_mut(&self.state.from).unwrap();
+        let amount = self.state.amount;
+        if *client_balance - amount < 0 {
+            return TransactionResult::Error(Transaction::<Error> {
+                accounts: self.accounts,
+                state: Error::new_state("Insufficient funds".to_string()),
+            });
         }
-    }
-}
 
-impl DepositState for Transaction<Deposit> {
-    fn deposit(mut self) -> Transaction<Finish> {
-        let balance = self.accounts.get_mut(&self.state.to).unwrap(); // previously checked
-        *balance -= self.state.amount;
-        Transaction::<Finish> {
+        *client_balance -= amount;
+
+        let destination_balance = accounts.get_mut(&self.state.to).unwrap();
+        *destination_balance += amount;
+        TransactionResult::Finish(Transaction::<Finish> {
             accounts: self.accounts,
             state: Finish,
-        }
+        })
     }
 }
 

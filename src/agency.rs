@@ -1,8 +1,12 @@
 use crate::bank::bank_api;
-use crate::bank::bank_api::{CheckBalanceState, DepositState, FinishState, WithdrawState};
+use crate::bank::bank_api::{
+    AccountValidationState as BankAccountValidationState, FinishState as BankFinishState,
+    ValidState as BankValidState,
+};
 use crate::Trip;
 use agency_api::*;
 use typestate::typestate;
+use std::convert::TryInto;
 
 #[typestate(enumerate = "TSession")]
 pub mod agency_api {
@@ -24,7 +28,9 @@ pub mod agency_api {
     }
 
     #[state]
-    pub struct Error;
+    pub struct Error {
+        pub message: String,
+    }
     pub trait Error {
         fn close(self);
     }
@@ -52,10 +58,11 @@ pub mod agency_api {
     }
 
     #[state]
-    pub struct TError {
+    pub struct RetryError {
+        pub message: String,
         pub selected: Vec<Trip>,
     }
-    pub trait TError {
+    pub trait RetryError {
         fn retry(self) -> NonEmpty;
         fn close(self);
     }
@@ -67,7 +74,7 @@ pub mod agency_api {
 
     pub enum Transaction {
         Empty,
-        TError,
+        RetryError,
     }
 }
 
@@ -83,7 +90,11 @@ impl GuestState for Session<Guest> {
                 },
             })
         } else {
-            Login::Error(Session::<Error> { state: Error })
+            Login::Error(Session::<Error> {
+                state: Error {
+                    message: "Invalid credentials".to_string(),
+                },
+            })
         }
     }
 }
@@ -136,31 +147,46 @@ impl NonEmptyState for Session<NonEmpty> {
     }
     fn buy(self, token: &str) -> Transaction {
         // TODO finish
-        let mut passed = vec![true; self.state.selected.len()];
+        let mut retain = vec![true; self.state.selected.len()];
         for (i, trip) in self.state.selected.iter().enumerate() {
-            let check = bank_api::Transaction::<bank_api::CheckBalance>::start_transaction(
-                token,
-                "travel_agency",
-                trip.price,
-            );
-            match check.check_balance() {
-                bank_api::BalanceResult::Withdraw(w) => {
-                    let deposit = w.withdraw();
-                    let fin = deposit.deposit();
-                    fin.finish();
-                    passed[i] = false;
+            let transaction =
+                bank_api::Transaction::<bank_api::AccountValidation>::start_transaction(
+                    token,
+                    "travel_agency",
+                    trip.price.try_into().unwrap(),
+                );
+            match transaction.validate_accounts() {
+                bank_api::AccountValidationResult::Valid(validated) => {
+                    match validated.perform_transaction() {
+                        bank_api::TransactionResult::Finish(finish) => {
+                            finish.finish();
+                            retain[i] = false;
+                        }
+                        bank_api::TransactionResult::Error(error) => {
+                            let mut selected = self.state.selected;
+                            let mut j = 0;
+                            selected.retain(|_| (retain[j], j += 1).0);
+                            return Transaction::RetryError(Session::<RetryError> {
+                                state: RetryError {
+                                    message: error.state.message,
+                                    selected,
+                                },
+                            });
+                        }
+                    }
                 }
-                bank_api::BalanceResult::Error(e) => {
-                    use crate::bank::bank_api::ErrorState;
-                    e.finish();
+                bank_api::AccountValidationResult::Error(error) => {
                     let mut selected = self.state.selected;
                     let mut j = 0;
-                    selected.retain(|_| (passed[j], j += 1).0);
-                    return Transaction::TError(Session::<TError> {
-                        state: TError { selected },
+                    selected.retain(|_| (retain[j], j += 1).0);
+                    return Transaction::RetryError(Session::<RetryError> {
+                        state: RetryError {
+                            message: error.state.message,
+                            selected,
+                        },
                     });
                 }
-            };
+            }
         }
         Transaction::Empty(Session::<Empty> {
             state: Empty {
@@ -179,7 +205,7 @@ impl ErrorState for Session<Error> {
     }
 }
 
-impl TErrorState for Session<TError> {
+impl RetryErrorState for Session<RetryError> {
     fn retry(self) -> Session<NonEmpty> {
         Session::<NonEmpty> {
             state: NonEmpty {

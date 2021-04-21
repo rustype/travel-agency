@@ -4,7 +4,6 @@ mod bank;
 use agency::agency_api::*;
 use std::{
     io::{stdin, stdout, Result, Write},
-    usize,
 };
 
 const LOGIN: &'static str = "login";
@@ -118,7 +117,7 @@ fn main() -> Result<()> {
                         } else {
                             match s.buy(split_input[1]) {
                                 Transaction::Empty(empty_sess) => empty_sess.into(),
-                                Transaction::TError(error) => error.into(),
+                                Transaction::RetryError(error) => error.into(),
                             }
                         }
                     }
@@ -132,7 +131,7 @@ fn main() -> Result<()> {
                         s.into()
                     }
                 },
-                TSession::TError(s) => match cmd {
+                TSession::RetryError(s) => match cmd {
                     RETRY => s.retry().into(),
                     CLOSE => {
                         s.close();
