@@ -91,7 +91,9 @@ dependencies = [
 
 [[package]]
 name = "typestate"
-version = "0.3.0-alpha"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f7aca52a855daf18de39ab0288f3c9bab9264c7815a3badc46d2f6c1e8456fd2"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -102,7 +104,9 @@ dependencies = [
 
 [[package]]
 name = "typestate-automata"
-version = "0.2.0"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "534bc8a2e41f91a38c1c2f4af4c8a24c140d04d3d59f897b9674fd24d3a8a39d"
 
 [[package]]
 name = "unicode-xid"
