@@ -1,0 +1,27 @@
+@startuml
+hide empty description
+[*] --> Guest : init
+NonEmpty --> [*] : close
+Empty --> [*] : close
+Error --> [*] : close
+RetryError --> [*] : close
+Empty : search_trip
+NonEmpty : search_trip
+NonEmpty : add_trip
+RetryError --> NonEmpty : retry
+state C_Empty <<choice>>
+Empty --> C_Empty: add_trip
+C_Empty --> Empty
+C_Empty --> NonEmpty
+
+state C_NonEmpty <<choice>>
+NonEmpty --> C_NonEmpty: buy
+C_NonEmpty --> Empty
+C_NonEmpty --> RetryError
+
+state C_Guest <<choice>>
+Guest --> C_Guest: login
+C_Guest --> Empty
+C_Guest --> Error
+
+@enduml

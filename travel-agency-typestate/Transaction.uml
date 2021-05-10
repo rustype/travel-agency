@@ -1,0 +1,16 @@
+@startuml
+hide empty description
+[*] --> AccountValidation : start_transaction
+Error --> [*] : finish
+Finish --> [*] : finish
+state C_Valid <<choice>>
+Valid --> C_Valid: perform_transaction
+C_Valid --> Error
+C_Valid --> Finish
+
+state C_AccountValidation <<choice>>
+AccountValidation --> C_AccountValidation: validate_accounts
+C_AccountValidation --> Error
+C_AccountValidation --> Valid
+
+@enduml

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="471px" preserveAspectRatio="none" style="width:384px;height:471px;" version="1.1" viewBox="0 0 384 471" width="384px" zoomAndPan="magnify"><defs><filter height="300%" id="fx9a4qu2tnap1" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><ellipse cx="72.5" cy="18" fill="#000000" filter="url(#fx9a4qu2tnap1)" rx="10" ry="10" style="stroke: none; stroke-width: 1.0;"/><rect fill="#FEFECE" filter="url(#fx9a4qu2tnap1)" height="40" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="133" x="6" y="105"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="123" x="11" y="129.8467">AccountValidation</text><rect fill="#FEFECE" filter="url(#fx9a4qu2tnap1)" height="40" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="50" x="238.5" y="323"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="33" x="247" y="347.8467">Error</text><ellipse cx="305.5" cy="450" fill="none" filter="url(#fx9a4qu2tnap1)" rx="10" ry="10" style="stroke: #000000; stroke-width: 1.0;"/><ellipse cx="306" cy="450.5" fill="#000000" rx="6" ry="6" style="stroke: none; stroke-width: 1.0;"/><rect fill="#FEFECE" filter="url(#fx9a4qu2tnap1)" height="40" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="50" x="323.5" y="323"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="40" x="328.5" y="347.8467">Finish</text><polygon fill="#FEFECE" filter="url(#fx9a4qu2tnap1)" points="72.5,230,84.5,242,72.5,254,60.5,242,72.5,230" style="stroke: #A80036; stroke-width: 1.5;"/><rect fill="#FEFECE" filter="url(#fx9a4qu2tnap1)" height="40" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="50" x="119.5" y="222"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacingAndGlyphs" textLength="32" x="128.5" y="246.8467">Valid</text><polygon fill="#FEFECE" filter="url(#fx9a4qu2tnap1)" points="348.5,230,360.5,242,348.5,254,336.5,242,348.5,230" style="stroke: #A80036; stroke-width: 1.5;"/><!--MD5=[52ad651b5a71d7659b4cc4f759aece1f]
+link *start to AccountValidation--><path d="M72.5,28.32 C72.5,44.12 72.5,76.65 72.5,99.38 " fill="none" id="*start-&gt;AccountValidation" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="72.5,104.64,76.5,95.64,72.5,99.64,68.5,95.64,72.5,104.64" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="109" x="73.5" y="71.0669">start_transaction</text><!--MD5=[7748d72ab64101d2b173fcc1f57892c5]
+link Error to *end--><path d="M261.23,363.03 C260.4,376.68 260.95,395.2 267.5,410 C273.02,422.48 284.4,433.29 293.28,440.34 " fill="none" id="Error-&gt;*end" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="297.39,443.49,292.6787,434.8411,293.421,440.449,287.8131,441.1914,297.39,443.49" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="33" x="268.5" y="406.0669">finish</text><!--MD5=[31c9e9e633d946ef73692b555ef1626e]
+link Finish to *end--><path d="M340.61,363.26 C332.01,384.26 318.48,417.3 310.97,435.63 " fill="none" id="Finish-&gt;*end" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="309.03,440.39,316.1481,433.5832,310.9287,435.7645,308.7473,430.5452,309.03,440.39" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="33" x="328.5" y="406.0669">finish</text><!--MD5=[3a24e77cc32c54fe7e391ead74b6c25a]
+link AccountValidation to C_AccountValidation--><path d="M72.5,145.25 C72.5,167.44 72.5,203.53 72.5,224.49 " fill="none" id="AccountValidation-&gt;C_AccountValidation" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="72.5,229.72,76.5,220.72,72.5,224.72,68.5,220.72,72.5,229.72" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="115" x="73.5" y="188.0669">validate_accounts</text><!--MD5=[1061cc982c22f2ef49f6da740525f3bf]
+link C_AccountValidation to Valid--><path d="M84.59,242 C94.42,242 104.26,242 114.09,242 " fill="none" id="C_AccountValidation-&gt;Valid" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="119.23,242,110.23,238,114.23,242,110.23,246,119.23,242" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[48da040ac6ef9b310e5e8ba1cffb1c1d]
+link C_AccountValidation to Error--><path d="M79.04,247.61 C84.82,251.61 93.56,257.46 101.5,262 C146.4,287.67 200.67,313.46 233.61,328.57 " fill="none" id="C_AccountValidation-&gt;Error" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="238.31,330.72,231.7806,323.3466,233.7606,328.6456,228.4616,330.6256,238.31,330.72" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[e36cc7f7f7a6794af214a268f1d07c69]
+link Valid to C_Valid--><path d="M169.51,242 C211.32,242 294.4,242 330.76,242 " fill="none" id="Valid-&gt;C_Valid" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="336.18,242,327.18,238,331.18,242,327.18,246,336.18,242" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacingAndGlyphs" textLength="130" x="188" y="235.0669">perform_transaction</text><!--MD5=[91de3a914c9c50cd96bcfdcd55996574]
+link C_Valid to Error--><path d="M343.18,249.19 C331.43,262.88 302.75,296.28 283.2,319.05 " fill="none" id="C_Valid-&gt;Error" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="279.91,322.89,288.812,318.6764,283.171,319.0998,282.7477,313.4588,279.91,322.89" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[ab7106a4f31658e7e15382890df06230]
+link C_Valid to Finish--><path d="M348.5,254.36 C348.5,269.65 348.5,297.26 348.5,317.42 " fill="none" id="C_Valid-&gt;Finish" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="348.5,322.63,352.5,313.63,348.5,317.63,344.5,313.63,348.5,322.63" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[91b1fa8a4aaa3a0a574a6906c86841f1]
+@startuml
+hide empty description
+[*] - -> AccountValidation : start_transaction
+Error - -> [*] : finish
+Finish - -> [*] : finish
+
+state C_AccountValidation <<choice>>
+AccountValidation - -> C_AccountValidation: validate_accounts
+C_AccountValidation -> Valid
+C_AccountValidation -> Error
+
+state C_Valid <<choice>>
+Valid -> C_Valid: perform_transaction
+C_Valid - -> Error
+C_Valid - -> Finish
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 10:22:07 WET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.11+9-Ubuntu-0ubuntu2.20.10
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
