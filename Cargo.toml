@@ -1,2 +1,2 @@
 [workspace]
-members = ["travel-agency-typestate", "travel-agency-ferrite", "travel-agency-st"]
+members = ["travel-agency-typestate", "travel-agency-st"]
